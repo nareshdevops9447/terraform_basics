@@ -1,87 +1,84 @@
-resource "aws_vpc" "main" {
+resource "aws_subnet" "public" {
+  vpc_id     = aws_vpc.main.id # it will fetch VPC ID created from above code
+  cidr_block = var.public_subnet_cidr # this is hard coding
+
+  tags = merge(var.tags, {
+    Name = "public-subnet"
+  })
+}
+
+resource "aws_vpc" "main" { #this name belongs to only terraform reference
+
   cidr_block       = var.cidr
   instance_tenancy = "default"
-
-  tags = {
-    Name = "automated_vpc" #aws naming
-  }
+  tags = merge(var.tags, {
+    Name = "timings"
+  })
 }
 
-# public subnet
-resource "aws_subnet" "main" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
-
-  tags = {
-    Name = "public_subnet"
-  }
-}
-
-# private subnet
 resource "aws_subnet" "private" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.2.0/24"
+  vpc_id     = aws_vpc.main.id # it will fetch VPC ID created from above code
+  cidr_block = var.private_subnet_cidr
 
-  tags = {
-    Name = "private_subnet"
-  }
+  tags = merge(var.tags, {
+    Name = "private-subnet"
+  })
 }
 
-# internet gateway
+resource "aws_internet_gateway" "automated-igw" {
+  vpc_id = aws_vpc.main.id # internet gateway depends on VPC
 
-resource "aws_internet_gateway" "automated-IGW" {
-  vpc_id = aws_vpc.main.id
-
-  tags = {
-    Name = "automated-IGW"
-  }
+  tags =  merge(var.tags, {
+    Name = "timing-igw"
+  })
 }
 
 resource "aws_route_table" "public-rt" {
   vpc_id = aws_vpc.main.id
 
   route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.automated-IGW.id
+    cidr_block = var.internet_cidr
+    gateway_id = aws_internet_gateway.automated-igw.id
   }
 
-  tags = {
-    Name = "public-rt"
-  }
+  tags = merge(var.tags, {
+    Name = "public-route-table"
+  })
 }
-# EIP
+
 resource "aws_eip" "auto-eip" {
 
 }
 
-# nat gateway
-resource "aws_nat_gateway" "automated-NAT" {
+resource "aws_nat_gateway" "example" {
   allocation_id = aws_eip.auto-eip.id
-  subnet_id     = aws_subnet.main.id
-  tags = {
-    Name = "automated-NAT"
-  }
+  subnet_id     = aws_subnet.public.id
+
+  tags = merge(var.tags, {
+    Name = "timing-ng"
+  })
 
   # To ensure proper ordering, it is recommended to add an explicit dependency
   # on the Internet Gateway for the VPC.
-  depends_on = [aws_internet_gateway.automated-IGW]
+  depends_on = [aws_internet_gateway.automated-igw]
 }
 
 resource "aws_route_table" "private-rt" { #for private route we don't attach IGW, we attach NAT
   vpc_id = aws_vpc.main.id
 
   route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.automated-NAT.id
+    cidr_block = var.internet_cidr
+    gateway_id = aws_nat_gateway.example.id
   }
 
-  tags = {
-    Name = "private-rt"
-  }
+  tags = merge(var.tags, {
+    Name = "private-route-table"
+  })
 }
 
+
 resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.main.id
+  subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public-rt.id
 }
 
