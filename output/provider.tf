@@ -5,8 +5,6 @@ terraform {
       version = "~> 4.0"
     }
   }
-
-
   backend "s3" {
     bucket = "timing-s3"
     key = "timing"
@@ -14,7 +12,6 @@ terraform {
     dynamodb_table = "timing-lock"
   }
 }
-
 # Configure the AWS Provider
 provider "aws" {
   region = "us-east-1"
