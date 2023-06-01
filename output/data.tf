@@ -2,8 +2,8 @@ data "aws_ami" "ami_info"{
 
   most_recent      = true
   # owners           = [var.aws_acc[data.aws_region.current.name]]
-  owners = ["137112412989"]
-  # owners = [lookup(var.aws_acc,data.aws_region.current.name)]
+
+   owners = [lookup(var.aws_acc,data.aws_region.current.name)]
 
   filter {
     name   = "name"
