@@ -3,5 +3,6 @@ varaible "tags" {
     default = {
         Name = "timing"
         Env = "DEV"
+        terraform = "true"
     }
 }
