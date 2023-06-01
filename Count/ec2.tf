@@ -5,7 +5,7 @@ resource "aws_instance" "web"{
   instance_type = "t3.micro"
   key_name = aws_key_pair.terraform.key_name
   count=3
-  tags{
+  tags = {
     Name = var.instances[count.index]
   }
 }
