@@ -1,4 +1,4 @@
-data "aws_ami" "ami_info" {
+data "aws_ami" "ami_info"{
   executable_users = ["self"]
   most_recent      = true
   owners           = [var.aws_acc[data.aws_region.current.name]]
