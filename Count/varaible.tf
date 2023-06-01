@@ -5,5 +5,5 @@ variable "instances" {
 
 variable "is_test" {
   type = bool
-  value = true
+  default = true
 }
