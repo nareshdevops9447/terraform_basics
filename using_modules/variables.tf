@@ -1,4 +1,4 @@
-varaible "tags" {
+variable "tags" {
     type = map
     default = {
         Name = "timing"
