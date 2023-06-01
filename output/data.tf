@@ -7,7 +7,12 @@ data "aws_ami" "ami_info"{
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-kernel-*-x86_64-gp2*"]
+    values = ["amzn2-ami-kernel-*-x86_64-gp2"]
+
+  }
+  filter {
+    name = "owner_account_id"
+    values = ["137112412989"]
   }
 
   filter {
