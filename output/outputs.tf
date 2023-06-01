@@ -3,5 +3,5 @@ output "ip_address" {
 }
 
 output "ami" {
-  value = data.aws_ami.ami_info
+  value = data.aws_ami.ami_info.image_id
 }
